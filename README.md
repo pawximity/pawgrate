@@ -2,6 +2,7 @@
 ## Pawgrate
 
 Pawgrate is a lightweight command-line utility for importing geospatial files into PostGIS using `ogr2ogr`. It simplifies the import process by prompting for parameters and generating the appropriate commands behind the scenes.
+
 ---
 
 ## Features
