@@ -1,0 +1,9 @@
+[project]
+name = "pawgrate"
+version = "0.1.0"
+description = "CLI tool to import geospatial data with ogr2ogr"
+authors = [{ name = "Pawximity", email = "chrisloverchio+gis@gmail.com" }]
+dependencies = []
+
+[project.scripts]
+pawgrate = "pawgrate.__main__:main"
