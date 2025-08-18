@@ -9,7 +9,6 @@ from pawgrate.config import ImportConfig
 def load_data(config: ImportConfig) -> tuple[list[str], subprocess.CompletedProcess]:
     if not shutil.which("ogr2ogr"):
         raise RuntimeError("ogr2ogr not found in PATH. Make sure GDAL is installed")
-
     if config.prompt_password:
         os.environ['PGPASSWORD'] = getpass("Postgres password: ")
     # specifically using subprocess to avoid the messy dependencies of the bindings...
