@@ -10,10 +10,22 @@ def load_data(config):
     if not shutil.which("ogr2ogr"):
         raise RuntimeError(
             "ogr2ogr not found in PATH. Make sure GDAL is installed")
+    command = build_command(config)
+    if config.dry_run:
+        return command, None
     env_copy = os.environ.copy()
     if config.prompt_password:
-        env_copy['PGPASSWORD'] = getpass("[!] Postgres password: ")
+        env_copy['PGPASSWORD'] = getpass("[!] Postgres password ")
     # specifically using subprocess to avoid the messy dependencies of the bindings...
+    process = subprocess.Popen(command,
+                               env=env_copy,
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE,
+                               text=True)
+    return command, process
+
+
+def build_command(config):
     command = [
         'ogr2ogr',
         '-f',
@@ -36,12 +48,7 @@ def load_data(config):
         f'EPSG:{config.srid}',
     ]
     command.append(write_mode(config.mode))
-    process = subprocess.Popen(command,
-                               env=env_copy,
-                               stdout=subprocess.PIPE,
-                               stderr=subprocess.PIPE,
-                               text=True)
-    return command, process
+    return command
 
 
 def write_mode(mode):

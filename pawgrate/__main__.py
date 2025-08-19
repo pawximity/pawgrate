@@ -28,7 +28,7 @@ def main():
 
 def arg_parser():
     parser = argparse.ArgumentParser(
-        description="pawgrate: Import geospatial data into PostGIS")
+        description="pawgrate: friendly ogr2ogr wrapper for PostGIS")
     subparsers = parser.add_subparsers(title="Commands", dest="command")
     import_parser = subparsers.add_parser("import",
                                           help="Import a file into PostGIS")
@@ -66,7 +66,10 @@ def arg_parser():
                                help="Append or overwrite an existing table")
     import_parser.add_argument("--prompt-password",
                                action="store_true",
-                               help="Prompt for Postgres password.")
+                               help="Prompt for Postgres password")
+    import_parser.add_argument("--dry-run",
+                               action="store_true",
+                               help="Print the ogr2ogr command and exit")
     import_parser.set_defaults(func=import_data)
     return parser
 
@@ -82,21 +85,24 @@ def import_data(args):
                           geomtype=args.geomtype,
                           srid=args.srid,
                           mode=args.mode,
-                          prompt_password=args.prompt_password)
-    print(
-        f"[*] Importing {config.src} into {config.dbname}.{config.table} as {config.user}"
-    )
+                          prompt_password=args.prompt_password,
+                          dry_run=args.dry_run)
+    print(f"[*] Importing {config.src} into {config.dbname}.{config.table}")
     command, process = load_data(config)
+    command_output = ' '.join(command)
+    if process is None and config.dry_run:
+        print("[+]", command_output)
+        sys.exit(0)
     print("[*] Executing command")
-    print("[+]", " ".join(command))
+    print("[+]", command_output)
     show_progress(process)
     if process.returncode == 0:
         print("[+] Import completed successfully")
     else:
-        print(f"[!] Import failed with record code: {result.returncode}")
-        print(f"[!] stderr: {result.stderr}")
+        print(f"[!] Import failed with record code: {process.returncode}")
+        print(f"[!] stderr: {process.stderr}")
         print("[-]", " ".join(command))
-        sys.exit(result.returncode)
+        sys.exit(process.returncode)
 
 
 def show_progress(process):

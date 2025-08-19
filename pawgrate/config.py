@@ -14,3 +14,4 @@ class ImportConfig:
     srid: str
     mode: str
     prompt_password: bool
+    dry_run: bool
