@@ -2,7 +2,6 @@ import sys
 import time
 
 from pawgrate.config import ImportConfig
-from pawgrate.config import ImportConfig
 from pawgrate.loader import load_data
 import yaml
 
