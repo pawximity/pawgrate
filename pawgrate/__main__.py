@@ -1,9 +1,6 @@
 import argparse
-import sys
-import time
 
-from pawgrate.config import ImportConfig
-from pawgrate.loader import load_data
+from pawgrate.core import process_file, process_manual
 
 
 def puppy():
@@ -19,103 +16,70 @@ def puppy():
 def main():
     parser = arg_parser()
     args = parser.parse_args()
-    if hasattr(args, "func"):
-        print(puppy())
-        args.func(args)
-    else:
-        parser.print_help()
+    print(puppy())
+    return args.func(args)
 
 
 def arg_parser():
     parser = argparse.ArgumentParser(
         description="pawgrate: friendly ogr2ogr wrapper for PostGIS")
-    subparsers = parser.add_subparsers(title="Commands", dest="command")
-    import_parser = subparsers.add_parser("import",
-                                          help="Import a file into PostGIS")
-    import_parser.add_argument(
+    commands_subparser = parser.add_subparsers(title="Commands",
+                                               dest="command")
+    # import parent
+    import_parser = commands_subparser.add_parser(
+        "import", help="Import a file into PostGIS")
+    import_subparser = import_parser.add_subparsers(dest="mode", required=True)
+    # import flags using a yaml config file
+    file_parser = import_subparser.add_parser(
+        "file", help="Import using a yaml config")
+    file_parser.add_argument("--config",
+                             required=True,
+                             help="Use a yaml config file")
+    file_parser.set_defaults(func=process_file)
+    # import flags individually through the cli
+    manual_parser = import_subparser.add_parser(
+        "manual", help="Import using individual flags")
+    manual_parser.add_argument(
         "--src",
         required=True,
         help="Path to the import file (e.g. .geojson, .shp)")
-    import_parser.add_argument("--dbname",
+    manual_parser.add_argument("--dbname",
                                required=True,
                                help="Name of the Postgres database")
-    import_parser.add_argument("--schema",
+    manual_parser.add_argument("--schema",
                                default="public",
                                help="Name of the Postgres schema")
-    import_parser.add_argument("--user",
+    manual_parser.add_argument("--user",
                                required=True,
                                help="Name of the Postgres user")
-    import_parser.add_argument("--host",
+    manual_parser.add_argument("--host",
                                default="localhost",
                                help="Name of the Postgres host")
-    import_parser.add_argument("--port",
+    manual_parser.add_argument("--port",
                                default="5432",
                                help="Postgres port (Default: 5432)")
-    import_parser.add_argument("--table",
+    manual_parser.add_argument("--table",
                                required=True,
                                help="Name of the destination table")
-    import_parser.add_argument(
+    manual_parser.add_argument(
         "--geomtype",
         required=True,
         help="Geometry type (e.g. MULTILINESTRING, MULTIPOLYGON)")
-    import_parser.add_argument("--srid",
+    manual_parser.add_argument("--srid",
                                required=True,
                                help="SRID of the geometry column")
-    import_parser.add_argument("--mode",
-                               default="append",
+    manual_parser.add_argument("--mode",
+                               choices=["append", "overwrite"],
                                help="Append or overwrite an existing table")
-    import_parser.add_argument("--prompt-password",
+    manual_parser.add_argument("--prompt-password",
                                action="store_true",
                                help="Prompt for Postgres password")
-    import_parser.add_argument("--dry-run",
+    manual_parser.add_argument("--dry-run",
                                action="store_true",
                                help="Print the ogr2ogr command and exit")
-    import_parser.set_defaults(func=import_data)
+    manual_parser.set_defaults(func=process_manual)
     return parser
 
 
-def import_data(args):
-    config = ImportConfig(src=args.src,
-                          dbname=args.dbname,
-                          schema=args.schema,
-                          user=args.user,
-                          host=args.host,
-                          port=args.port,
-                          table=args.table,
-                          geomtype=args.geomtype,
-                          srid=args.srid,
-                          mode=args.mode,
-                          prompt_password=args.prompt_password,
-                          dry_run=args.dry_run)
-    print(f"[*] Importing {config.src} into {config.dbname}.{config.table}")
-    command, process = load_data(config)
-    command_output = ' '.join(command)
-    if process is None and config.dry_run:
-        print("[+]", command_output)
-        sys.exit(0)
-    print("[*] Executing command")
-    print("[+]", command_output)
-    show_progress(process)
-    if process.returncode == 0:
-        print("[+] Import completed successfully")
-    else:
-        print(f"[!] Import failed with record code: {process.returncode}")
-        print(f"[!] stderr: {process.stderr}")
-        print("[-]", " ".join(command))
-        sys.exit(process.returncode)
-
-
-def show_progress(process):
-    counter = 0
-    display = '@' * 50
-    while process.poll() is None:
-        line = f"{display[:counter % len(display)]}"
-        sys.stdout.write("\r\033[K" + line)
-        sys.stdout.flush()
-        counter += 1
-        time.sleep(1.00)
-    sys.stdout.write("\r\033[K")
-
-
 if __name__ == '__main__':
-    main()
+    raise SystemExit(main())
