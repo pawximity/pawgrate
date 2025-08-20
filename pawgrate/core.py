@@ -1,26 +1,27 @@
 import sys
 import time
 
+from pawgrate.config import ConfigError
 from pawgrate.config import ImportConfig
+from pawgrate.config import ImportError
 from pawgrate.loader import load_data
 import yaml
 
 
 def process_file(args):
     config_file = args.config
-    if config_file:
-        try:
-            print("[*] Loading config file", config_file)
-            import_config = ImportConfig(**load_yaml(config_file))
-            return process_config(import_config)
-        except FileNotFoundError:
-            print("[!] Could not find file", config_file)
-            return 1
-        except yaml.YAMLError as e:
-            print("[!] Invalid yaml", e)
-            return 1
-    print("[!] Config file was not provided")
-    return 1
+    if not config_file:
+        raise ConfigError("Config file was not provided")
+    try:
+        print("[*] Loading config file", config_file)
+        with open(config_file, 'r') as f:
+            yaml_data = yaml.safe_load(f) or {}
+        import_config = ImportConfig(**yaml_data)
+        return process_config(import_config)
+    except FileNotFoundError:
+        raise ConfigError(f"Could not find config file {config_file}")
+    except yaml.YAMLError as e:
+        raise ConfigError(f"Invalid yaml {e}")
 
 
 def process_manual(args):
@@ -45,31 +46,26 @@ def process_config(config):
     command_output = ' '.join(command)
     if process is None and config.dry_run:
         print("[+]", command_output)
-        return 0
+        return
     print("[*] Executing command")
     print("[+]", command_output)
     show_progress(process)
+    _, stderr = process.communicate()
     if process.returncode == 0:
         print("[+] Import completed successfully")
+        return
     else:
-        print(f"[!] Import failed with record code {process.returncode}")
-        print(f"[!] stderr {process.stderr}")
         print("[-]", " ".join(command))
-    return process.returncode
+        raise ImportError(
+            f"ogr2ogr failed with return code {process.returncode}")
 
 
 def show_progress(process):
-    counter = 0
-    display = '@' * 50
+    counter, display = 0, '@' * 50
     while process.poll() is None:
         line = f"{display[:counter % len(display)]}"
         sys.stdout.write("\r\033[K" + line)
         sys.stdout.flush()
         counter += 1
-        time.sleep(1.00)
+        time.sleep(0.25)
     sys.stdout.write("\r\033[K")
-
-
-def load_yaml(file_path):
-    with open(file_path, 'r') as file:
-        return yaml.safe_load(file)

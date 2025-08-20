@@ -1,6 +1,8 @@
 import argparse
 
-from pawgrate.core import process_file, process_manual
+from pawgrate.config import PawgrateError
+from pawgrate.core import process_file
+from pawgrate.core import process_manual
 
 
 def puppy():
@@ -14,10 +16,14 @@ def puppy():
 
 
 def main():
+    print(puppy())
     parser = arg_parser()
     args = parser.parse_args()
-    print(puppy())
-    return args.func(args)
+    try:
+        args.func(args)
+    except PawgrateError as e:
+        print("[!]", e)
+        return 1
 
 
 def arg_parser():
@@ -29,6 +35,12 @@ def arg_parser():
     import_parser = commands_subparser.add_parser(
         "import", help="Import a file into PostGIS")
     import_subparser = import_parser.add_subparsers(dest="mode", required=True)
+    file_parser(import_subparser)
+    manual_parser(import_subparser)
+    return parser
+
+
+def file_parser(import_subparser):
     # import flags using a yaml config file
     file_parser = import_subparser.add_parser(
         "file", help="Import using a yaml config")
@@ -36,6 +48,9 @@ def arg_parser():
                              required=True,
                              help="Use a yaml config file")
     file_parser.set_defaults(func=process_file)
+
+
+def manual_parser(import_subparser):
     # import flags individually through the cli
     manual_parser = import_subparser.add_parser(
         "manual", help="Import using individual flags")
@@ -78,7 +93,6 @@ def arg_parser():
                                action="store_true",
                                help="Print the ogr2ogr command and exit")
     manual_parser.set_defaults(func=process_manual)
-    return parser
 
 
 if __name__ == '__main__':

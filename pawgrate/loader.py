@@ -3,12 +3,14 @@ import os
 import shutil
 import subprocess
 
+from pawgrate.config import ConfigError
 from pawgrate.config import ImportConfig
+from pawgrate.config import ImportError
 
 
 def load_data(config):
     if not shutil.which("ogr2ogr"):
-        raise RuntimeError(
+        raise ImportError(
             "ogr2ogr not found in PATH. Make sure GDAL is installed")
     command = build_command(config)
     if config.dry_run:
@@ -57,4 +59,4 @@ def write_mode(mode):
     elif mode == 'overwrite':
         return "-overwrite"
     else:
-        raise ValueError(f"Invalid mode: {mode}")
+        raise ConfigError(f"Invalid mode: {mode}")

@@ -1,5 +1,6 @@
-# Only needed if supporting Python < 3.10
-argparse; python_version < "3.10"
-
-# Optional: formatter for dev
-yapf
+mypy_extensions==1.1.0
+packaging==25.0
+pathspec==0.12.1
+platformdirs==4.3.8
+PyYAML==6.0.2
+yapf==0.43.0
