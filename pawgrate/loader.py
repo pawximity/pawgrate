@@ -9,6 +9,12 @@ from pawgrate.config import ImportError
 
 
 def load_data(config):
+    """Loads config data into an ogr2ogr command.
+
+    Builds a command and spawns a subprocess unless dry_run is set.
+    Returns the command and the process object. Raises an error if 
+    ogr2ogr isn't found on the class path.
+    """
     if not shutil.which("ogr2ogr"):
         raise ImportError(
             "ogr2ogr not found in PATH. Make sure GDAL is installed")

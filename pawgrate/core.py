@@ -9,6 +9,13 @@ import yaml
 
 
 def process_file(args):
+    """Processes a YAML config file.
+
+    Loads a YAML file and creates an ImportConfig object from its contents. 
+    The resulting config is passed on for further processing. 
+    Raises errors if the file path wasn't provided, it can't find the file on disk, 
+    and if the yaml within the file is invalid.
+    """
     config_file = args.config
     if not config_file:
         raise ConfigError("Config file was not provided")
@@ -24,6 +31,11 @@ def process_file(args):
 
 
 def process_manual(args):
+    """Processes manually provided args.
+
+    Loads manually provided args and creates an ImportConfig object.
+    The resulting config is passed on for further processing.
+    """
     args_dict, allowed = vars(args), ImportConfig.__dataclass_fields__.keys()
     filtered_args = {
         k: v
@@ -33,6 +45,12 @@ def process_manual(args):
 
 
 def process_config(config):
+    """Processes the ImportConfig object.
+
+    Builds an ogr2ogr command from the provided config, spawns the
+    subprocess, and monitors its execution. Raises an error if 
+    the process fails.
+    """
     print(f"[*] Importing {config.src} into {config.dbname}.{config.table}")
     command, process = load_data(config)
     command_output = ' '.join(command)
