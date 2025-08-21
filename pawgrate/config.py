@@ -17,13 +17,13 @@ class ImportError(PawgrateError):
 class ImportConfig:
     src: str
     dbname: str
-    schema: str
     user: str
-    host: str
-    port: str
     table: str
     geomtype: str
     srid: str
-    mode: str
-    prompt_password: bool
-    dry_run: bool
+    host: str = "localhost"
+    port: str = "5432"
+    schema: str = "public"
+    mode: str = "append"
+    prompt_password: bool = False
+    dry_run: bool = False

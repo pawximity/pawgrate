@@ -17,7 +17,7 @@ def load_data(config):
         return command, None
     env_copy = os.environ.copy()
     if config.prompt_password:
-        env_copy['PGPASSWORD'] = getpass("[!] Postgres password ")
+        env_copy["PGPASSWORD"] = getpass("[!] Postgres password ")
     # specifically using subprocess to avoid the messy dependencies of the bindings...
     process = subprocess.Popen(command,
                                env=env_copy,
@@ -54,9 +54,9 @@ def build_command(config):
 
 
 def write_mode(mode):
-    if mode == 'append':
+    if mode == "append":
         return "-append"
-    elif mode == 'overwrite':
+    elif mode == "overwrite":
         return "-overwrite"
     else:
         raise ConfigError(f"Invalid mode: {mode}")

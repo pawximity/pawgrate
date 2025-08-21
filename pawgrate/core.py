@@ -16,8 +16,7 @@ def process_file(args):
         print("[*] Loading config file", config_file)
         with open(config_file, 'r') as f:
             yaml_data = yaml.safe_load(f) or {}
-        import_config = ImportConfig(**yaml_data)
-        return process_config(import_config)
+        return process_config(ImportConfig(**yaml_data))
     except FileNotFoundError:
         raise ConfigError(f"Could not find config file {config_file}")
     except yaml.YAMLError as e:
@@ -25,19 +24,12 @@ def process_file(args):
 
 
 def process_manual(args):
-    import_config = ImportConfig(src=args.src,
-                                 dbname=args.dbname,
-                                 schema=args.schema,
-                                 user=args.user,
-                                 host=args.host,
-                                 port=args.port,
-                                 table=args.table,
-                                 geomtype=args.geomtype,
-                                 srid=args.srid,
-                                 mode=args.mode,
-                                 prompt_password=args.prompt_password,
-                                 dry_run=args.dry_run)
-    return process_config(import_config)
+    args_dict, allowed = vars(args), ImportConfig.__dataclass_fields__.keys()
+    filtered_args = {
+        k: v
+        for k, v in args_dict.items() if k in allowed and v is not None
+    }
+    return process_config(ImportConfig(**filtered_args))
 
 
 def process_config(config):
@@ -55,9 +47,10 @@ def process_config(config):
         print("[+] Import completed successfully")
         return
     else:
-        print("[-]", " ".join(command))
+        print("\n[-]", " ".join(command))
         raise ImportError(
-            f"ogr2ogr failed with return code {process.returncode}")
+            f"ogr2ogr failed with return code {process.returncode}\n\n{stderr.strip()}"
+        )
 
 
 def show_progress(process):
