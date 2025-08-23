@@ -39,12 +39,12 @@ def main():
 def arg_parser():
     parser = argparse.ArgumentParser(
         description="pawgrate: friendly ogr2ogr wrapper for PostGIS")
-    commands_subparser = parser.add_subparsers(title="Commands",
+    commands_subparser = parser.add_subparsers(title="commands",
                                                dest="command",
                                                required=True)
     # import parent
     import_parser = commands_subparser.add_parser(
-        "import", help="Import a file into PostGIS")
+        "import", help="import a file into PostGIS")
     import_subparser = import_parser.add_subparsers(dest="mode", required=True)
     file_parser(import_subparser)
     manual_parser(import_subparser)
@@ -54,49 +54,48 @@ def arg_parser():
 def file_parser(import_subparser):
     # import flags using a yaml config file
     file_parser = import_subparser.add_parser(
-        "file", help="Import using a yaml config")
+        "file", help="import using a yaml config")
     file_parser.add_argument("--config",
                              required=True,
-                             help="Use a yaml config file")
+                             help="use a yaml config file")
     file_parser.set_defaults(func=process_file)
 
 
 def manual_parser(import_subparser):
     # import flags individually through the cli
-    manual_parser = import_subparser.add_parser(
-        "manual", help="Import using individual flags")
+    manual_parser = import_subparser.add_parser("manual",
+                                                help="import using flags")
     manual_parser.add_argument(
         "--src",
         required=True,
-        help="Path to the import file (e.g. .geojson, .shp)")
+        help="path to the import file (e.g. .geojson, .shp)")
     manual_parser.add_argument("--dbname",
                                required=True,
-                               help="Name of the Postgres database")
-    manual_parser.add_argument("--schema", help="Name of the Postgres schema")
-    manual_parser.add_argument("--user",
-                               required=True,
-                               help="Name of the Postgres user")
-    manual_parser.add_argument("--host", help="Name of the Postgres host")
-    manual_parser.add_argument("--port", help="Postgres port (Default: 5432)")
+                               help="postgres database")
+    manual_parser.add_argument("--schema", help="postgres schema")
+    manual_parser.add_argument("--user", required=True, help="postgres user")
+    manual_parser.add_argument("--host",
+                               help="postgres host (Default: localhost)")
+    manual_parser.add_argument("--port", help="postgres port (Default: 5432)")
     manual_parser.add_argument("--table",
                                required=True,
-                               help="Name of the destination table")
+                               help="destination table")
     manual_parser.add_argument(
         "--geomtype",
         required=True,
-        help="Geometry type (e.g. MULTILINESTRING, MULTIPOLYGON)")
+        help="geometry type (e.g. MULTILINESTRING, MULTIPOLYGON)")
     manual_parser.add_argument("--srid",
                                required=True,
                                help="SRID of the geometry column")
     manual_parser.add_argument("--mode",
                                choices=["append", "overwrite"],
-                               help="Append or overwrite an existing table")
+                               help="append or overwrite an existing table")
     manual_parser.add_argument("--prompt-password",
                                action="store_true",
-                               help="Prompt for Postgres password")
+                               help="prompt for postgres password")
     manual_parser.add_argument("--dry-run",
                                action="store_true",
-                               help="Print the ogr2ogr command and exit")
+                               help="print the ogr2ogr command and exit")
     manual_parser.set_defaults(func=process_manual)
 
 
