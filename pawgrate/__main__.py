@@ -40,7 +40,8 @@ def arg_parser():
     parser = argparse.ArgumentParser(
         description="pawgrate: friendly ogr2ogr wrapper for PostGIS")
     commands_subparser = parser.add_subparsers(title="Commands",
-                                               dest="command")
+                                               dest="command",
+                                               required=True)
     # import parent
     import_parser = commands_subparser.add_parser(
         "import", help="Import a file into PostGIS")
