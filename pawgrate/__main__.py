@@ -5,8 +5,8 @@ This tool reads configuration from YAML files or CLI flags and generates
 ogr2ogr commands to import data into PostgreSQL/PostGIS. 
 
 Usage:
-    pawgrate --config config.yaml
-    pawgrate manual --src mydata.shp --dbname pawx --table roads
+    pawgrate import file --config config.yaml
+    pawgrate import manual --src mydata.shp --dbname pawx --table roads
 """
 import argparse
 
