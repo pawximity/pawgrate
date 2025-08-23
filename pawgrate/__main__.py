@@ -75,8 +75,8 @@ def manual_parser(import_subparser):
     manual_parser.add_argument("--schema", help="postgres schema")
     manual_parser.add_argument("--user", required=True, help="postgres user")
     manual_parser.add_argument("--host",
-                               help="postgres host (Default: localhost)")
-    manual_parser.add_argument("--port", help="postgres port (Default: 5432)")
+                               help="postgres host (default: localhost)")
+    manual_parser.add_argument("--port", help="postgres port (default: 5432)")
     manual_parser.add_argument("--table",
                                required=True,
                                help="destination table")
