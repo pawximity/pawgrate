@@ -69,14 +69,17 @@ def manual_parser(import_subparser):
         "--src",
         required=True,
         help="path to the import file (e.g. .geojson, .shp)")
+    manual_parser.add_argument("--host",
+                               help="postgres host (default: localhost)")
+    manual_parser.add_argument("--port", help="postgres port (default: 5432)")
+    manual_parser.add_argument("--user", required=True, help="postgres user")
+    manual_parser.add_argument("--prompt-password",
+                               action="store_true",
+                               help="prompt for postgres password")
     manual_parser.add_argument("--dbname",
                                required=True,
                                help="postgres database")
     manual_parser.add_argument("--schema", help="postgres schema")
-    manual_parser.add_argument("--user", required=True, help="postgres user")
-    manual_parser.add_argument("--host",
-                               help="postgres host (default: localhost)")
-    manual_parser.add_argument("--port", help="postgres port (default: 5432)")
     manual_parser.add_argument("--table",
                                required=True,
                                help="destination table")
@@ -90,9 +93,6 @@ def manual_parser(import_subparser):
     manual_parser.add_argument("--mode",
                                choices=["append", "overwrite"],
                                help="append or overwrite an existing table")
-    manual_parser.add_argument("--prompt-password",
-                               action="store_true",
-                               help="prompt for postgres password")
     manual_parser.add_argument("--dry-run",
                                action="store_true",
                                help="print the ogr2ogr command and exit")

@@ -1,3 +1,4 @@
+import shlex
 import sys
 import time
 
@@ -53,7 +54,7 @@ def process_config(config):
     """
     print(f"[*] Importing {config.src} into {config.dbname}.{config.table}")
     command, process = load_data(config)
-    command_output = ' '.join(command)
+    command_output = shlex.join(command)
     if process is None and config.dry_run:
         print("[+]", command_output)
         return
@@ -65,7 +66,7 @@ def process_config(config):
         print("[+] Import completed successfully")
         return
     else:
-        print("\n[-]", " ".join(command))
+        print("\n[-]", command_output)
         raise ImportError(
             f"ogr2ogr failed with return code {process.returncode}\n\n{stderr.strip()}"
         )
