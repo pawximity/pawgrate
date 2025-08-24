@@ -1,12 +1,12 @@
-import types
-import pytest
-from io import StringIO
 import sys
+
+from io import StringIO
+from pawgrate import core
+import pytest
+import types
 
 
 def test_process_file(monkeypatch, tmp_path):
-    from pawgrate import core
-
     config_file_path = create_yaml(tmp_path)
 
     called = {}
@@ -26,7 +26,6 @@ def test_process_file(monkeypatch, tmp_path):
 
 
 def test_process_file_missing_config_raises():
-    from pawgrate import core
     from pawgrate.config import ConfigError
 
     with pytest.raises(ConfigError):
@@ -43,7 +42,6 @@ def test_process_file_not_found_raises(tmp_path):
 
 
 def test_process_file_invalid_yaml_raises(monkeypatch, tmp_path):
-    from pawgrate import core
     from pawgrate.config import ConfigError
 
     invalid = tmp_path / "invalid.yml"
@@ -53,8 +51,6 @@ def test_process_file_invalid_yaml_raises(monkeypatch, tmp_path):
 
 
 def test_process_manual_filters_and_delegates(monkeypatch):
-    from pawgrate import core
-
     called = {}
 
     def fake_process_config(config):
@@ -63,19 +59,19 @@ def test_process_manual_filters_and_delegates(monkeypatch):
 
     monkeypatch.setattr(core, "process_config", fake_process_config)
 
-    args = types.SimpleNamespace(src="/tmp/a.shp",
+    args = types.SimpleNamespace(command="import",
+                                 src="/tmp/a.shp",
+                                 host="localhost",
+                                 port="5432",
+                                 user="postgres",
+                                 prompt_password=False,
                                  dbname="pawx",
+                                 schema="public",
                                  table="t",
                                  geomtype="PROMOTE_TO_MULTI",
                                  srid="26912",
-                                 user="postgres",
-                                 schema="public",
-                                 host="localhost",
-                                 port="5432",
                                  mode="append",
-                                 prompt_password=False,
                                  dry_run=False,
-                                 command="import",
                                  func="process_manual")
 
     return_code = core.process_manual(args)
@@ -87,8 +83,6 @@ def test_process_manual_filters_and_delegates(monkeypatch):
 
 
 def test_process_config_dry_run_prints_command(monkeypatch):
-    from pawgrate import core
-
     def fake_load_data(config):
         return ([
             "ogr2ogr", "-f", "PostgreSQL", "PG:...", config.src, "-nln",
@@ -111,8 +105,6 @@ def test_process_config_dry_run_prints_command(monkeypatch):
 
 
 def test_process_config_success(monkeypatch):
-    from pawgrate import core
-
     monkeypatch.setattr(core, "show_progress", lambda progress: None)
 
     class FakeProc:
@@ -134,7 +126,6 @@ def test_process_config_success(monkeypatch):
 
 
 def test_process_config_failure_raises_with_stderr(monkeypatch):
-    from pawgrate import core
     from pawgrate.config import ImportError
 
     monkeypatch.setattr(core, "show_progress", lambda progress: None)
@@ -179,17 +170,17 @@ def create_yaml(tmp_path):
 
 def create_config(**data):
     Config = types.SimpleNamespace
-    config_map = dict(host="localhost",
-                      dbname="pawx",
-                      user="u",
+    config_map = dict(src="/tmp/a.shp",
+                      host="localhost",
                       port="5432",
-                      src="/tmp/a.shp",
+                      user="u",
+                      prompt_password=False,
+                      dbname="pawx",
                       schema="public",
                       table="t",
                       geomtype="PROMOTE_TO_MULTI",
                       srid="26912",
                       mode="append",
-                      prompt_password=False,
                       dry_run=False)
     config_map.update(data)
     return Config(**config_map)

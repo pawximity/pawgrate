@@ -1,9 +1,9 @@
+from pawgrate import loader
 import pytest
 import types
 
 
 def test_load_data_ogr2ogr_missing_raises(monkeypatch):
-    from pawgrate import loader
     from pawgrate.config import ImportError
 
     monkeypatch.setattr(loader.shutil, "which", lambda *_: None)
@@ -13,8 +13,6 @@ def test_load_data_ogr2ogr_missing_raises(monkeypatch):
 
 
 def test_load_data_dry_run(monkeypatch):
-    from pawgrate import loader
-
     monkeypatch.setattr(loader.shutil, "which", lambda *_: "/usr/bin/ogr2ogr")
 
     cmd, proc = loader.load_data(create_config(dry_run=True))
@@ -23,8 +21,6 @@ def test_load_data_dry_run(monkeypatch):
 
 
 def test_load_data_spawns_process(monkeypatch):
-    from pawgrate import loader
-
     monkeypatch.setattr(loader.shutil, "which", lambda *_: "/usr/bin/ogr2ogr")
     monkeypatch.setattr(loader, "getpass", lambda prompt="": "secret")
 
@@ -53,8 +49,6 @@ def test_load_data_spawns_process(monkeypatch):
 
 
 def test_build_command_flags():
-    from pawgrate import loader
-
     config = create_config(mode="append")
     cmd = loader.build_command(config)
     cmd_output = " ".join(cmd)
@@ -66,7 +60,6 @@ def test_build_command_flags():
 
 
 def test_write_mode_invalid_raises():
-    from pawgrate import loader
     from pawgrate.config import ConfigError
 
     with pytest.raises(ConfigError):
@@ -75,17 +68,17 @@ def test_write_mode_invalid_raises():
 
 def create_config(**data):
     Config = types.SimpleNamespace
-    config_map = dict(host="localhost",
-                      dbname="pawx",
-                      user="u",
+    config_map = dict(src="/tmp/a.shp",
+                      host="localhost",
                       port="5432",
-                      src="/tmp/a.shp",
+                      user="u",
+                      prompt_password=False,
+                      dbname="pawx",
                       schema="public",
                       table="t",
                       geomtype="PROMOTE_TO_MULTI",
                       srid="26912",
                       mode="append",
-                      prompt_password=False,
                       dry_run=False)
     config_map.update(data)
     return Config(**config_map)
