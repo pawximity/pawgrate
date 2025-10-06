@@ -1,18 +1,6 @@
 from dataclasses import dataclass
 
 
-class PawgrateError(Exception):
-    pass
-
-
-class ConfigError(PawgrateError):
-    pass
-
-
-class ImportError(PawgrateError):
-    pass
-
-
 @dataclass
 class ImportConfig:
     src: str

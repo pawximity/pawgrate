@@ -26,7 +26,7 @@ def test_process_file(monkeypatch, tmp_path):
 
 
 def test_process_file_missing_config_raises():
-    from pawgrate.config import ConfigError
+    from pawgrate.error import ConfigError
 
     with pytest.raises(ConfigError):
         core.process_file(make_args(config=None))
@@ -34,7 +34,7 @@ def test_process_file_missing_config_raises():
 
 def test_process_file_not_found_raises(tmp_path):
     from pawgrate import core
-    from pawgrate.config import ConfigError
+    from pawgrate.error import ConfigError
 
     missing = tmp_path / "missing.yml"
     with pytest.raises(ConfigError):
@@ -42,7 +42,7 @@ def test_process_file_not_found_raises(tmp_path):
 
 
 def test_process_file_invalid_yaml_raises(monkeypatch, tmp_path):
-    from pawgrate.config import ConfigError
+    from pawgrate.error import ConfigError
 
     invalid = tmp_path / "invalid.yml"
     invalid.write_text("src: [unterminated\n")
@@ -83,6 +83,7 @@ def test_process_manual_filters_and_delegates(monkeypatch):
 
 
 def test_process_config_dry_run_prints_command(monkeypatch):
+
     def fake_load_data(config):
         return ([
             "ogr2ogr", "-f", "PostgreSQL", "PG:...", config.src, "-nln",
@@ -126,7 +127,7 @@ def test_process_config_success(monkeypatch):
 
 
 def test_process_config_failure_raises_with_stderr(monkeypatch):
-    from pawgrate.config import ImportError
+    from pawgrate.error import ImportError
 
     monkeypatch.setattr(core, "show_progress", lambda progress: None)
     stderr_msg = "error"

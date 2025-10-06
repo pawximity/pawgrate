@@ -10,9 +10,9 @@ Usage:
 """
 import argparse
 
-from pawgrate.config import PawgrateError
 from pawgrate.core import process_file
 from pawgrate.core import process_manual
+from pawgrate.error import PawgrateError
 
 
 def puppy():

@@ -4,7 +4,7 @@ import types
 
 
 def test_load_data_ogr2ogr_missing_raises(monkeypatch):
-    from pawgrate.config import ImportError
+    from pawgrate.error import ImportError
 
     monkeypatch.setattr(loader.shutil, "which", lambda *_: None)
 
@@ -60,7 +60,7 @@ def test_build_command_flags():
 
 
 def test_write_mode_invalid_raises():
-    from pawgrate.config import ConfigError
+    from pawgrate.error import ConfigError
 
     with pytest.raises(ConfigError):
         loader.write_mode("nope")

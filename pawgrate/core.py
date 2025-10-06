@@ -2,9 +2,9 @@ import shlex
 import sys
 import time
 
-from pawgrate.config import ConfigError
 from pawgrate.config import ImportConfig
-from pawgrate.config import ImportError
+from pawgrate.error import ConfigError
+from pawgrate.error import ImportError
 from pawgrate.loader import load_data
 import yaml
 

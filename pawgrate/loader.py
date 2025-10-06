@@ -3,9 +3,9 @@ import os
 import shutil
 import subprocess
 
-from pawgrate.config import ConfigError
 from pawgrate.config import ImportConfig
-from pawgrate.config import ImportError
+from pawgrate.error import ConfigError
+from pawgrate.error import ImportError
 
 
 def load_data(config):
